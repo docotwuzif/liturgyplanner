@@ -5,7 +5,7 @@
     "scripts": {
         "dev": "nuxt PORT=8080",
         "build": "nuxt build",
-        "start": "nuxt-start",
+        "start": "node ./node_modules/nuxt-start/bin/nuxt-start.js",
         "generate": "nuxt generate",
         "lint:js": "eslint --ext \".js,.ts,.vue\" --ignore-path .gitignore .",
         "lint:prettier": "prettier --check .",
