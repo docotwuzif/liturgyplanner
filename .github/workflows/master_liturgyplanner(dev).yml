@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy Node.js app to Azure Web App - liturgyplanner(dev)
+name: Build and deploy Node.js app to Azure Web App - liturgyplanner
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: node-app
-          path: ./.nuxt
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: 'liturgyplanner(dev)'
+          app-name: 'liturgyplanner'
           slot-name: 'dev'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_41abd96d09eb40f5887cfac34f54ca7d }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_98C81D61CBEA49ACBDA74A68BBC94FAB }}
           package: .
