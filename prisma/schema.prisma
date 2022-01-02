@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRESQLCONNSTR_DATABASE_URL")
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
+  name         String?
+  created      DateTime     @default(now())
+  role         String       @default("user")
+  updated      DateTime     @default(now()) @updatedAt
+  assignments  Assignment[]
+  qualifiedFor Service[]
+}
+
+model Occasion {
+  id          Int               @id @default(autoincrement())
+  date        DateTime
+  name        String
+  created     DateTime          @default(now())
+  updated     DateTime          @updatedAt
+  createdBy   String
+  createdById Int
+  updatedBy   String
+  updatedById Int
+  events      Event[]
+  schedule    ScheduleElement[]
+}
+
+model Event {
+  id          Int               @id @default(autoincrement())
+  date        DateTime
+  name        String
+  occasionId  Int
+  created     DateTime          @default(now())
+  updated     DateTime          @updatedAt
+  createdBy   String
+  createdById Int
+  updatedBy   String
+  updatedById Int
+  occasion    Occasion          @relation(fields: [occasionId], references: [id])
+  assignments Assignment[]
+  schedule    ScheduleElement[]
+}
+
+model Service {
+  id             Int          @id @default(autoincrement())
+  name           String
+  assignments    Assignment[]
+  qualifiedUsers User[]
+}
+
+model Assignment {
+  serviceId   Int
+  eventId     Int
+  userId      Int
+  created     DateTime @default(now())
+  updated     DateTime @updatedAt
+  createdBy   String
+  createdById Int
+  updatedBy   String
+  updatedById Int
+  comment     String?
+  event       Event    @relation(fields: [eventId], references: [id])
+  service     Service  @relation(fields: [serviceId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@id([serviceId, eventId, userId])
+}
+
+model ScheduleElement {
+  id             Int      @id @default(autoincrement())
+  type           String
+  source         String?
+  sourceRef      String?
+  title          String
+  remarks        String?
+  attachmentUrls String[]
+  occasionId     Int
+  created        DateTime @default(now())
+  updated        DateTime @updatedAt
+  createdBy      String
+  createdById    Int
+  updatedBy      String
+  updatedById    Int
+  position       String
+  order          Int      @default(999)
+  occasion       Occasion @relation(fields: [occasionId], references: [id])
+  events         Event[]
+}
