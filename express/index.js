@@ -5,7 +5,17 @@ const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const axios = require('axios').default;
 const express = require('express');
 
-const prisma = new PrismaClient()
+let prisma
+
+if (process.env.NODE_ENV === "production") {
+    prisma = new PrismaClient()
+} else {
+    if (!global.prisma) {
+        global.prisma = new PrismaClient()
+    }
+
+    prisma = global.prisma
+}
 
 const authMiddleware = require('./authMiddleware');
 
@@ -81,6 +91,18 @@ app.use(authMiddleware);
 app.get('/events', async(_, res) => {
     res.status(200).json(await prisma.event.findMany());
 })
+app.get('/events/future', async(_, res) => {
+    res.status(200).json(await prisma.event.findMany({
+        where: {
+            date: {
+                gte: new Date(),
+            }
+        },
+        orderBy: {
+            date: 'asc'
+        }
+    }));
+})
 app.get('/user/:id/assignments/future', async(req, res) => {
     const assignments = await prisma.assignment.findMany({
         where: {
@@ -89,6 +111,11 @@ app.get('/user/:id/assignments/future', async(req, res) => {
                 date: {
                     gte: new Date(),
                 }
+            }
+        },
+        orderBy: {
+            event: {
+                date: 'asc',
             }
         },
         select: {
