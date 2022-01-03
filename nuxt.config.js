@@ -88,7 +88,7 @@ export default {
 
     serverMiddleware: [
         { path: '/api', handler: '~/express/index.js' },
-        { path: '/.auth', handler: '~/serverMiddleware/auth.js' }
+        { path: '/auth', handler: '~/serverMiddleware/auth.js' }
     ],
 
     privateRuntimeConfig: {

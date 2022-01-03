@@ -19,7 +19,7 @@ export default function(req, res, _next) {
     if (req.url === '/login/aad') {
         const authCodeUrlParameters = {
             scopes: ["user.read"],
-            redirectUri: `${baseUrl}/.auth/login/aad/callback`,
+            redirectUri: `${baseUrl}/auth/login/aad/callback`,
         };
 
 
@@ -32,7 +32,7 @@ export default function(req, res, _next) {
         const tokenRequest = {
             code: url.searchParams.get('code'),
             scopes: ["user.read"],
-            redirectUri: `${baseUrl}/.auth/login/aad/callback`,
+            redirectUri: `${baseUrl}/auth/login/aad/callback`,
         };
 
 

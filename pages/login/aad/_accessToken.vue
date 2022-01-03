@@ -6,7 +6,7 @@
 export default {
   async beforeCreate() {
     try {
-      await this.$axios.post('http://localhost:8080/api/auth/register', {
+      await this.$axios.post('/api/auth/register', {
         method: 'aad',
         accessToken: this.$route.params.accessToken,
       })
