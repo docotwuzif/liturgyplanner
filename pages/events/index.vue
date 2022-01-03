@@ -2,7 +2,11 @@
   <v-row justify="center" align="center">
     <v-col cols="12" sm="8" md="6">
       <v-list
-        ><v-list-item v-for="event in events" :key="event.id">
+        ><v-list-item
+          v-for="event in events"
+          :key="event.id"
+          :to="`/events/${event.id}`"
+        >
           <v-list-item-content>
             <v-list-item-title v-text="event.name" />
           </v-list-item-content>

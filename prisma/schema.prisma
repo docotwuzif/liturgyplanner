@@ -16,10 +16,12 @@ model Session {
 
 model User {
   id           Int          @id @default(autoincrement())
+  uid          String       @unique
+  authProvider AuthProvider
   email        String       @unique
   name         String?
   created      DateTime     @default(now())
-  role         String       @default("user")
+  role         UserRole     @default(GUEST)
   updated      DateTime     @default(now()) @updatedAt
   assignments  Assignment[]
   qualifiedFor Service[]
@@ -99,4 +101,15 @@ model ScheduleElement {
   order          Int      @default(999)
   occasion       Occasion @relation(fields: [occasionId], references: [id])
   events         Event[]
+}
+
+enum AuthProvider {
+  AAD
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  USER
+  GUEST
 }
