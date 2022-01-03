@@ -9,27 +9,31 @@
     disable-filtering
     hide-default-footer
   >
-    <template #item="{ item, isMobile }">
-      <tr v-if="!isMobile">
-        <td
-          v-for="field in headers"
-          :key="field.value"
-          class="d-block d-sm-table-cell"
-        >
-          {{ item[field.value] }}
-        </td>
-      </tr>
-      <tr v-if="isMobile">
-        <td>
-          <p>
-            <b>{{ item['position'] }}:</b> {{ item['source'] }}
-            {{ item['sourceRef'] }} - {{ item['title'] }}
-          </p>
-          <p v-if="item['remarks']" style="padding-left: 20px">
-            {{ item['remarks'] }}
-          </p>
-        </td>
-      </tr>
+    <template #body="{ items, isMobile }">
+      <tbody v-if="!isMobile">
+        <tr v-for="item in items" :key="item.id">
+          <td
+            v-for="field in headers"
+            :key="field.value"
+            class="d-block d-sm-table-cell"
+          >
+            {{ item[field.value] }}
+          </td>
+        </tr>
+      </tbody>
+      <tbody v-if="isMobile">
+        <tr v-for="item in items" :key="item.id">
+          <td>
+            <p>
+              <b>{{ item['position'] }}:</b> {{ item['source'] }}
+              {{ item['sourceRef'] }} - {{ item['title'] }}
+            </p>
+            <p v-if="item['remarks']" style="padding-left: 20px">
+              {{ item['remarks'] }}
+            </p>
+          </td>
+        </tr>
+      </tbody>
     </template>
   </v-data-table>
 </template>
@@ -37,6 +41,10 @@
 <script>
 export default {
   props: {
+    eventId: {
+      type: Number,
+      required: true,
+    },
     occasionId: {
       type: Number,
       required: true,
@@ -55,8 +63,12 @@ export default {
   }),
   async fetch() {
     this.loading = true
-    this.scheduleItems = await this.$axios.$get(
+    const res = await this.$axios.$get(
       `/api/occasions/${this.occasionId}/schedule`
+    )
+    this.scheduleItems = res.filter(
+      (x) =>
+        x.events.length === 0 || x.events.some((y) => y.id === this.eventId)
     )
     this.loading = false
   },

@@ -35,8 +35,18 @@
         </v-expansion-panels>
       </v-card>
       <v-card>
-        <v-card-title>Ablauf</v-card-title>
-        <EventScheduleTable :occasion-id="event.occasion.id" />
+        <v-card-title
+          >Ablauf <v-spacer /><v-card-actions
+            ><v-btn icon :to="`/occasions/${event.occasion.id}`"
+              ><v-icon>mdi-pencil</v-icon></v-btn
+            ></v-card-actions
+          ></v-card-title
+        >
+
+        <EventScheduleTable
+          :occasion-id="event.occasion.id"
+          :event-id="event.id"
+        />
       </v-card>
     </v-col>
   </v-row>

@@ -6,13 +6,15 @@
       :key="`${assignment.event.id}_${assignment.service.id}`"
       :to="`/events/${assignment.event.id}`"
     >
-      <v-list-item-title
-        >{{ $moment(assignment.event.date).format('LLL') }} -
-        {{ assignment.service.name }}</v-list-item-title
-      >
-      <v-list-item-subtitle>
-        {{ assignment.event.name }}
-      </v-list-item-subtitle>
+      <v-list-item-content>
+        <v-list-item-title
+          >{{ $moment(assignment.event.date).format('LLL') }} -
+          {{ assignment.service.name }}</v-list-item-title
+        >
+        <v-list-item-subtitle>
+          {{ assignment.event.name }}
+        </v-list-item-subtitle>
+      </v-list-item-content>
     </v-list-item>
   </v-list>
 </template>
