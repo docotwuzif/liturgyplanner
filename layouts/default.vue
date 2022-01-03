@@ -37,6 +37,8 @@
       </v-btn>
       <v-toolbar-title v-text="title" />
       <v-spacer />
+      <auth-button />
+      <user-menu />
       <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>mdi-menu</v-icon>
       </v-btn>
@@ -63,8 +65,10 @@
 </template>
 
 <script>
+import AuthButton from '~/components/AuthButton.vue'
 export default {
   name: 'DefaultLayout',
+  components: { AuthButton },
   data() {
     return {
       clipped: false,

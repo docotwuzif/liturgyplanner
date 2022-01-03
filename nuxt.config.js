@@ -29,7 +29,13 @@ export default {
         '@nuxt/typescript-build',
         // https://go.nuxtjs.dev/vuetify
         '@nuxtjs/vuetify',
+        '@nuxtjs/moment'
     ],
+
+    moment: {
+        defaultLocale: 'de',
+        locales: ['de']
+    },
 
     // Modules: https://go.nuxtjs.dev/config-modules
     modules: [
@@ -76,9 +82,18 @@ export default {
         port: 8080
     },
 
+    router: {
+        middleware: 'auth'
+    },
+
     serverMiddleware: [
-        { path: '/api', handler: '~/express/index.js' }
+        { path: '/api', handler: '~/express/index.js' },
+        { path: '/.auth', handler: '~/serverMiddleware/auth.js' }
     ],
+
+    privateRuntimeConfig: {
+        msalSecret: process.env.MICROSOFT_PROVIDER_AUTHENTICATION_SECRET
+    },
 
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {},
