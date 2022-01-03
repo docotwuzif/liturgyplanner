@@ -30,6 +30,7 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
+        <EventScheduleTable :occasion-id="event.occasion.id" />
       </v-card>
     </v-col>
   </v-row>

@@ -110,7 +110,16 @@ app.get('/events/:id', async(req, res) => {
         }
     }));
 })
-
+app.get('/occasions/:id/schedule', async(req, res) => {
+    res.status(200).json(await prisma.scheduleElement.findMany({
+        where: {
+            occasionId: Number.parseInt(req.params.id)
+        },
+        orderBy: {
+            order: 'asc'
+        }
+    }));
+})
 
 app.get('/services', async(_, res) => {
     res.status(200).json(await prisma.service.findMany());
