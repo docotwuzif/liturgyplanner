@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row align="center" justify="center">
     <v-col cols="12" md="6">
       <v-card>
         <v-card-title v-text="event.name" />
@@ -12,6 +12,9 @@
             }}</v-list-item-subtitle>
           </v-list-item>
         </v-list>
+      </v-card>
+      <v-card>
+        <v-card-title>Einteilung</v-card-title>
         <v-expansion-panels multiple>
           <v-expansion-panel v-for="group in serviceGroups" :key="group.id">
             <v-expansion-panel-header
@@ -30,6 +33,9 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
+      </v-card>
+      <v-card>
+        <v-card-title>Ablauf</v-card-title>
         <EventScheduleTable :occasion-id="event.occasion.id" />
       </v-card>
     </v-col>

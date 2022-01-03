@@ -81,6 +81,23 @@ app.use(authMiddleware);
 app.get('/events', async(_, res) => {
     res.status(200).json(await prisma.event.findMany());
 })
+app.get('/user/:id/assignments/future', async(req, res) => {
+    const assignments = await prisma.assignment.findMany({
+        where: {
+            userId: Number.parseInt(req.params.id),
+            event: {
+                date: {
+                    gte: new Date(),
+                }
+            }
+        },
+        select: {
+            event: true,
+            service: true
+        }
+    });
+    res.status(200).json(assignments);
+})
 app.get('/events/:id', async(req, res) => {
     res.status(200).json(await prisma.event.findUnique({
         where: {
