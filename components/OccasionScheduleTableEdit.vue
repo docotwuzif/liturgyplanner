@@ -40,6 +40,39 @@
           </td>
         </tr>
       </draggable>
+      <draggable
+        v-if="isMobile"
+        v-model="scheduleItems"
+        tag="tbody"
+        @change="changeQueued"
+      >
+        <tr v-for="item in scheduleItems" :key="item.id">
+          <td>
+            <span
+              v-for="field in headers"
+              :key="field.value"
+              class="d-block d-sm-table-cell"
+            >
+              <v-text-field
+                v-if="field.value !== 'actions'"
+                v-model="item[field.value]"
+                :label="field.text"
+                @change="changeQueued"
+              />
+              <span v-if="field.value === 'actions'"
+                ><v-btn x-small icon @click="deleteItem(item)"
+                  ><v-icon>mdi-delete</v-icon></v-btn
+                ></span
+              >
+            </span>
+          </td>
+        </tr>
+        <tr slot="footer">
+          <td :colspan="headers.length" align="right">
+            <v-btn @click="addEmpty">Hinzufügen</v-btn>
+          </td>
+        </tr>
+      </draggable>
     </template>
     <template #footer>
       <v-card-actions>
@@ -79,6 +112,7 @@ export default {
   }),
   async fetch() {
     this.loading = true
+    this.scheduleItems = []
     this.scheduleItems = await this.$axios.$get(
       `/api/occasions/${this.occasionId}/schedule`
     )
@@ -87,7 +121,7 @@ export default {
   methods: {
     addEmpty() {
       this.scheduleItems.push({
-        id: -1,
+        id: -this.scheduleItems.length,
         source: '',
         sourceRef: '',
         title: '',
@@ -115,6 +149,7 @@ export default {
       })
 
       this.openChanges = false
+      this.$fetch()
     },
   },
 }
