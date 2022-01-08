@@ -20,6 +20,8 @@ model User {
   authProvider AuthProvider
   email        String       @unique
   name         String?
+  givenName    String?
+  surname      String?
   created      DateTime     @default(now())
   role         UserRole     @default(GUEST)
   updated      DateTime     @default(now()) @updatedAt

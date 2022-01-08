@@ -85,6 +85,11 @@ export default {
           title: 'Events',
           to: '/events',
         },
+        {
+          icon: 'mdi-account-group',
+          title: 'Benutzer',
+          to: '/users',
+        },
       ],
       miniVariant: false,
       right: true,

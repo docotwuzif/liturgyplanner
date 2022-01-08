@@ -15,24 +15,12 @@
       </v-card>
       <v-card>
         <v-card-title>Einteilung</v-card-title>
-        <v-expansion-panels multiple>
-          <v-expansion-panel v-for="group in serviceGroups" :key="group.id">
-            <v-expansion-panel-header
-              v-text="`${group.name} (${group.assignments.length})`"
-            />
-            <v-expansion-panel-content>
-              <p v-if="group.assignments.length === 0">Keine Einteilung.</p>
-              <v-list v-if="group.assignments.length > 0" dense>
-                <v-list-item
-                  v-for="assignment in group.assignments"
-                  :key="`${event.id}_${assignment.service.id}_${assignment.user.id}`"
-                >
-                  <v-list-item-title v-text="assignment.user.name" />
-                </v-list-item>
-              </v-list>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
+        <AssignmentPanels
+          :service-groups="serviceGroups"
+          :event-id="event.id"
+          @assignmentAdded="updateAssignments"
+          @assignmentDeleted="updateAssignments"
+        />
       </v-card>
       <v-card>
         <v-card-title
@@ -61,13 +49,28 @@ export default {
     const res2 = await $axios.get(`/api/services`)
     const services = res2.data
     const serviceGroups = Object.fromEntries(
-      services.map((x) => [x.id, { id: x.id, name: x.name, assignments: [] }])
+      services.map((x) => [
+        x.id,
+        {
+          id: x.id,
+          name: x.name,
+          assignments: [],
+          count: 0,
+          event: { id: params.id },
+        },
+      ])
     )
     for (const assignment of event.assignments) {
       serviceGroups[assignment.service.id].assignments.push(assignment)
+      serviceGroups[assignment.service.id].count++
     }
 
     return { event, serviceGroups }
+  },
+  methods: {
+    async updateAssignments() {
+      await this.$nuxt.refresh()
+    },
   },
 }
 </script>

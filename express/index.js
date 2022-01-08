@@ -1,265 +1,168 @@
-import { PrismaClient, AuthProvider } from '@prisma/client'
-const expressSession = require('express-session');
-const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
+import db from './dbConnector'
 
-const axios = require('axios').default;
+import authMiddleware from './authMiddleware';
+
+import prisma from './db/prisma';
+
 const express = require('express');
 
-let prisma
+const expressSession = require('express-session')
 
-if (process.env.NODE_ENV === "production") {
-    prisma = new PrismaClient()
-} else {
-    if (!global.prisma) {
-        global.prisma = new PrismaClient()
-    }
-
-    prisma = global.prisma
-}
-
-const authMiddleware = require('./authMiddleware');
+const { PrismaSessionStore } = require('@quixo3/prisma-session-store')
 
 
-const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const userMetaData = (req) => ({
+    createdBy: req.session.auth.user.name,
+    updatedBy: req.session.auth.user.name,
+    createdById: req.session.auth.user.id,
+    updatedById: req.session.auth.user.id,
+})
+
+const app = express()
+
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 app.use(
     expressSession({
         cookie: {
-            maxAge: 7 * 24 * 60 * 60 * 1000 // ms
+            maxAge: 7 * 24 * 60 * 60 * 1000, // ms
         },
         secret: 'liturgyplanner',
         resave: true,
         saveUninitialized: true,
-        store: new PrismaSessionStore(
-            prisma, {
-                checkPeriod: 2 * 60 * 1000,
-                dbRecordIdIsSessionId: true,
-                dbRecordIdFunction: undefined,
-            }
-        )
+        store: new PrismaSessionStore(prisma, {
+            checkPeriod: 2 * 60 * 1000,
+            dbRecordIdIsSessionId: true,
+            dbRecordIdFunction: undefined,
+        }),
     })
-);
-
+)
 
 // AUTH - can be accessed by everyone
 
 app.get('/auth/status', (req, res) => {
-    res.status(200).json(req.session);
-});
+    res.status(200).json(req.session)
+})
 
 app.post('/auth/register', async(req, res) => {
     if (req.body.method === 'aad') {
-        const userdata = await axios.get("https://graph.microsoft.com/v1.0/me", {
-            headers: {
-                Authorization: `Bearer ${req.body.accessToken}`
-            }
-        });
 
-
-        let user = await prisma.user.findUnique({
-            where: {
-                uid: userdata.data.id
-            }
-        });
-
-        if (!user) {
-            user = await prisma.user.create({
-                data: {
-                    authProvider: AuthProvider.AAD,
-                    email: userdata.data.mail,
-                    uid: userdata.data.id,
-                    name: userdata.data.displayName
-                }
-            })
-        }
+        const user = await db.User.registerFromAAD(req.body.accessToken)
 
         req.session.auth = {
             signedIn: true,
-            user
-        };
+            user,
+        }
     }
-    res.sendStatus(200);
-});
+    res.sendStatus(200)
+})
 
 // RESTRICTED - user need to be authorized
 
-app.use(authMiddleware);
+app.use(authMiddleware)
+
+app.get('/users', async(_, res) => {
+    res.status(200).json(await db.User.getAll());
+})
+
+app.get('/users/:id/assignments/future', async(req, res) => {
+    res.status(200).json(await db.User.getAssignments(req.params.id));
+})
+
+// events
 
 app.get('/events/future', async(_, res) => {
-    res.status(200).json(await prisma.event.findMany({
-        where: {
-            date: {
-                gte: new Date(),
-            }
-        },
-        select: {
-            id: true,
-            name: true,
-            date: true,
-            occasion: true
-        },
-        orderBy: {
-            date: 'asc'
-        }
-    }));
+    res.status(200).json(
+        await db.Event.getAll('future')
+    )
 })
 app.get('/events/past', async(_, res) => {
-    res.status(200).json(await prisma.event.findMany({
-        where: {
-            date: {
-                lte: new Date(),
-            }
-        },
-        select: {
-            id: true,
-            name: true,
-            date: true,
-            occasion: true
-        },
-        orderBy: {
-            date: 'desc'
-        }
-    }));
+    res.status(200).json(
+        await db.Event.getAll('past')
+    )
 })
-app.get('/user/:id/assignments/future', async(req, res) => {
-    const assignments = await prisma.assignment.findMany({
-        where: {
-            userId: Number.parseInt(req.params.id),
-            event: {
-                date: {
-                    gte: new Date(),
-                }
-            }
-        },
-        orderBy: {
-            event: {
-                date: 'asc',
-            }
-        },
-        select: {
-            event: true,
-            service: true
-        }
-    });
-    res.status(200).json(assignments);
-})
-app.get('/events/:id', async(req, res) => {
-    res.status(200).json(await prisma.event.findUnique({
-        where: {
-            id: Number.parseInt(req.params.id)
-        },
-        select: {
-            id: true,
-            name: true,
-            date: true,
-            occasion: {
-                select: {
-                    id: true,
-                    name: true
-                }
-            },
-            assignments: {
-                select: {
-                    service: true,
-                    user: {
-                        select: {
-                            name: true,
-                            id: true
-                        }
-                    }
-                }
-            },
 
-        }
-    }));
+app.get('/events/:id', async(req, res) => {
+    res.status(200).json(await db.Event.getById(req.params.id))
 })
 app.get('/occasions/:id/schedule', async(req, res) => {
-    res.status(200).json(await prisma.scheduleElement.findMany({
-        where: {
-            occasionId: Number.parseInt(req.params.id)
-        },
-        orderBy: {
-            order: 'asc'
-        },
-        select: {
-            id: true,
-            source: true,
-            sourceRef: true,
-            position: true,
-            title: true,
-            remarks: true,
-            type: true,
-            attachmentUrls: true,
-            events: true
-        }
-    }));
+    res.status(200).json(await db.Schedule.getForOccasion(req.params.id))
 })
-app.post('/schedule', async(req, res) => {
-    const { position, source, sourceRef, title, remarks, order, occasionId, type } = req.body;
-    await prisma.scheduleElement.create({
-        data: {
-            position,
-            source,
-            sourceRef,
-            title,
-            remarks,
-            order,
-            occasion: {
-                connect: {
-                    id: occasionId
-                }
-            },
-            type,
-            createdBy: req.session.auth.user.name,
-            updatedBy: req.session.auth.user.name,
-            createdById: req.session.auth.user.id,
-            updatedById: req.session.auth.user.id,
-        }
-    });
-    res.sendStatus(200);
-})
-app.put('/schedule/:id', async(req, res) => {
-    const { position, source, sourceRef, title, remarks, order } = req.body;
-    await prisma.scheduleElement.update({
-        where: {
-            id: Number.parseInt(req.body.id)
-        },
-        data: {
-            position,
-            source,
-            sourceRef,
-            title,
-            remarks,
-            order,
-            updatedBy: req.session.auth.user.name,
-            updatedById: req.session.auth.user.id,
-        }
-    });
-    res.sendStatus(200);
-})
-app.delete('/schedule/:id', async(req, res) => {
-    await prisma.scheduleElement.delete({
-        where: {
-            id: Number.parseInt(req.params.id)
-        }
-    });
-    res.sendStatus(200);
-});
 
 app.get('/services', async(_, res) => {
-    res.status(200).json(await prisma.service.findMany());
+    res.status(200).json(await db.Service.getAll())
 })
 
+// EDITOR
 
+// schedule
 
+app.post('/schedule', async(req, res) => {
+    await db.Schedule.create({...req.body, ...userMetaData(req) })
+    res.sendStatus(200)
+})
+app.put('/schedule/:id', async(req, res) => {
+    await db.Schedule.update(req.params.id, {...req.body, ...userMetaData(req) })
+    res.sendStatus(200)
+})
+app.delete('/schedule/:id', async(req, res) => {
+    await db.Schedule.del(req.params.id);
+    res.sendStatus(200)
+})
 
+// ADMIN
 
+// occasions 
+app.post('/occasions', async(req, res) => {
+    try {
+        const { occasions, eventSchemes } = req.body;
+        await db.Occasion.createBatch(occasions.map(occasion => ({
+            ...occasion,
+            ...userMetaData(req),
+        })), eventSchemes)
+        res.sendStatus(200);
+    } catch (err) {
+        res.status(500).json(err)
+    }
+})
 
+// asignments
 
+app.post('/assignments', async(req, res) => {
+    try {
+        const assignment = await db.Assignment.create({...req.body, ...userMetaData(req) })
+        res.status(200).json(assignment)
+    } catch (err) {
+        console.error(err);
+        res.status(500).json(err)
+    }
+})
 
+app.delete('/assignments', async(req, res) => {
+    try {
+        await db.Assignment.deleteEl(req.body)
+        res.sendStatus(200)
+    } catch (err) {
+        res.status(500).json(err)
+    }
+})
 
+// users
 
-module.exports = app;
+app.get('/users/AAD', async(_, res) => {
+    const users = await db.User.getAllFromAAD();
+    res.status(200).json(users.filter((user) => user.givenName && user.surname))
+})
+
+app.post('/users', async(req, res) => {
+    try {
+        await db.User.create(req.body);
+        res.status(200).json(user)
+    } catch {
+        res.sendStatus(500)
+    }
+})
+
+module.exports = app

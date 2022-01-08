@@ -27,7 +27,7 @@ export default {
   }),
   async fetch() {
     this.assignments = await this.$axios.$get(
-      `/api/user/${this.$store.state.auth.userData.id})/assignments/future`
+      `/api/users/${this.$store.state.auth.userData.id})/assignments/future`
     )
     this.loading = false
   },
