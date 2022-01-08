@@ -4,7 +4,7 @@
       <v-btn icon @click="$router.back()"
         ><v-icon>mdi-arrow-left</v-icon></v-btn
       >
-      <v-menu position-x
+      <v-menu offset-x
         ><template #activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on"
             ><v-icon>mdi-clipboard-text</v-icon></v-btn
