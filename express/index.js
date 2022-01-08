@@ -135,7 +135,6 @@ app.post('/assignments', async(req, res) => {
         const assignment = await db.Assignment.create({...req.body, ...userMetaData(req) })
         res.status(200).json(assignment)
     } catch (err) {
-        console.error(err);
         res.status(500).json(err)
     }
 })

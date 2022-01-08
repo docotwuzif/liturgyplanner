@@ -17,23 +17,11 @@ export async function createBatch(
       typeof createdById !== 'number' &&
       typeof updatedById !== 'number'
     ) {
-      console.error('Wrong input.')
       throw new TypeError('Wrong input.')
     }
     occasion.date = new Date(date)
 
-    console.log(occasion)
-
-    console.log(eventSchemes, occasion.date)
-
     const createEvent = (schema: EventSchema) => {
-      console.log(
-        occasion.date.getFullYear(),
-        occasion.date.getMonth(),
-        occasion.date.getDate() + schema.dayShift,
-        schema.hours,
-        schema.minutes
-      )
       const eventDate = new Date(
         occasion.date.getFullYear(),
         occasion.date.getMonth(),
@@ -41,7 +29,6 @@ export async function createBatch(
         schema.hours,
         schema.minutes
       )
-      console.log(eventDate)
       return {
         date: eventDate,
         name: schema.name,
@@ -54,7 +41,6 @@ export async function createBatch(
 
     const events: Prisma.EventCreateWithoutOccasionInput[] =
       eventSchemes.map(createEvent)
-    console.log(events)
     await prisma.occasion.create({
       data: { ...occasion, events: { createMany: { data: events } } },
     })
