@@ -38,12 +38,20 @@
               dense
             />
           </td>
+          <td style="vertical-align: baseline">
+            <v-icon
+              color="red"
+              @click="occasions = occasions.filter((x) => x !== occasion)"
+              >mdi-delete</v-icon
+            >
+          </td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="2" align="right">
+          <td colspan="3" align="right">
             <v-btn
+              text
               @click="
                 $refs.newOccasionsForm.validate()
                 occasions.push({ ...defaultValue })

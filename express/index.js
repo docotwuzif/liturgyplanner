@@ -90,6 +90,9 @@ app.get('/events/:id', async(req, res) => {
 app.get('/occasions/:id/schedule', async(req, res) => {
     res.status(200).json(await db.Schedule.getForOccasion(req.params.id))
 })
+app.get('/occasions/:id/events', async(req, res) => {
+    res.status(200).json(await db.Occasion.getEvents(req.params.id))
+})
 
 app.get('/services', async(_, res) => {
     res.status(200).json(await db.Service.getAll())
@@ -110,6 +113,9 @@ app.put('/schedule/:id', async(req, res) => {
 app.delete('/schedule/:id', async(req, res) => {
     await db.Schedule.del(req.params.id);
     res.sendStatus(200)
+})
+app.get('/schedule/templates', async(_, res) => {
+    res.status(200).json(await db.Schedule.getTemplates());
 })
 
 // ADMIN

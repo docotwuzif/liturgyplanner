@@ -46,3 +46,11 @@ export async function createBatch(
     })
   }
 }
+
+export async function getEvents(id: any) {
+  return await prisma.event.findMany({
+    where: {
+      occasionId: Number.parseInt(id),
+    },
+  })
+}

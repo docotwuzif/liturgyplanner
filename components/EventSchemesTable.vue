@@ -51,12 +51,19 @@
               dense
             />
           </td>
+          <td style="vertical-align: baseline">
+            <v-icon
+              color="red"
+              @click="schemes = schemes.filter((x) => x !== schema)"
+              >mdi-delete</v-icon
+            >
+          </td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="3" align="right">
-            <v-btn @click="schemes.push({ ...defaultSchema })"
+          <td colspan="4" align="right">
+            <v-btn text @click="schemes.push({ ...defaultSchema })"
               >Schema hinzufügen</v-btn
             >
           </td>

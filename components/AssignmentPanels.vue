@@ -60,7 +60,7 @@
       <v-card-actions>
         <v-spacer />
         <v-btn @click="addUser(addingDialogService.id)">Hinzufügen</v-btn>
-        <v-alert type="error" v-if="error" v-html="error" />
+        <v-alert v-if="error" type="error" v-text="error" />
       </v-card-actions>
     </v-card>
   </v-dialog>

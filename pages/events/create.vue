@@ -16,8 +16,9 @@
       </v-card>
       <v-card class="my-2">
         <v-card-actions
-          ><v-btn @click="send">Ereignisse erstellen</v-btn></v-card-actions
-        >
+          ><v-spacer /><v-btn @click="send">Ereignisse erstellen</v-btn
+          ><v-spacer
+        /></v-card-actions>
       </v-card>
     </v-col>
   </v-row>

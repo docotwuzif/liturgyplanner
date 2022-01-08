@@ -1,7 +1,7 @@
 <template>
   <v-menu v-if="$store.state.auth.signedIn" offset-y>
     <template #activator="{ on, attrs }">
-      <v-btn v-bind="attrs" v-on="on">{{
+      <v-btn text v-bind="attrs" v-on="on">{{
         $store.state.auth.userData.name
       }}</v-btn>
     </template>

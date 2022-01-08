@@ -19,6 +19,7 @@ export async function getForOccasion(id: any) {
       type: true,
       attachmentUrls: true,
       events: true,
+      template: true,
     },
   })
 }
@@ -37,6 +38,8 @@ export async function create(data: any) {
     updatedBy,
     createdById,
     updatedById,
+    events,
+    template,
   } = data
 
   const scheduleElement: Prisma.ScheduleElementCreateInput = {
@@ -50,6 +53,12 @@ export async function create(data: any) {
       connect: {
         id: occasionId,
       },
+    },
+    events: {
+      connect: events.map((x: any) => ({ id: Number.parseInt(x) })),
+    },
+    template: {
+      connect: { id: template.id },
     },
     type,
     createdBy,
@@ -71,23 +80,32 @@ export async function update(id: any, data: any) {
     title,
     remarks,
     order,
+    events,
+    type,
     updatedBy,
     updatedById,
   } = data
+
+  const scheduleElement: Prisma.ScheduleElementUpdateInput = {
+    position,
+    source,
+    sourceRef,
+    title,
+    remarks,
+    order,
+    type,
+    updatedBy,
+    updatedById,
+    events: {
+      set: events.map((x: any) => ({ id: Number.parseInt(x) })),
+    },
+  }
+
   return await prisma.scheduleElement.update({
     where: {
       id: Number.parseInt(id),
     },
-    data: {
-      position,
-      source,
-      sourceRef,
-      title,
-      remarks,
-      order,
-      updatedBy,
-      updatedById,
-    },
+    data: scheduleElement,
   })
 }
 
@@ -97,4 +115,8 @@ export async function del(id: any) {
       id: Number.parseInt(id),
     },
   })
+}
+
+export async function getTemplates() {
+  return await prisma.scheduleTemplate.findMany()
 }

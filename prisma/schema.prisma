@@ -85,7 +85,7 @@ model Assignment {
 }
 
 model ScheduleElement {
-  id             Int      @id @default(autoincrement())
+  id             Int               @id @default(autoincrement())
   type           String
   source         String?
   sourceRef      String?
@@ -93,16 +93,25 @@ model ScheduleElement {
   remarks        String?
   attachmentUrls String[]
   occasionId     Int
-  created        DateTime @default(now())
-  updated        DateTime @updatedAt
+  created        DateTime          @default(now())
+  updated        DateTime          @updatedAt
   createdBy      String
   createdById    Int
   updatedBy      String
   updatedById    Int
   position       String
-  order          Int      @default(999)
-  occasion       Occasion @relation(fields: [occasionId], references: [id])
+  order          Int               @default(999)
+  occasion       Occasion          @relation(fields: [occasionId], references: [id])
   events         Event[]
+  templateId     Int?
+  template       ScheduleTemplate? @relation(fields: [templateId], references: [id])
+}
+
+model ScheduleTemplate {
+  id     Int               @id @default(autoincrement())
+  name   String
+  data   Json
+  usedBy ScheduleElement[]
 }
 
 enum AuthProvider {
