@@ -7,7 +7,7 @@ import { Component, Vue } from 'vue-property-decorator'
 
 @Component
 export default class EventListView extends Vue {
-  private mode = 'future'
+  private mode = 'past'
 }
 </script>
 

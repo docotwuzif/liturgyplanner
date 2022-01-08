@@ -4,6 +4,7 @@
       <v-expansion-panels multiple v-bind="attrs" v-on="on">
         <v-expansion-panel v-for="group in serviceGroups" :key="group.id">
           <v-expansion-panel-header
+            :style="`color: rgb(0,0,0,${group.count === 0 ? '.38' : '.87'})`"
             >{{ group.name }} ({{ group.count }})<template #actions
               ><v-icon color="green" @click="showAddingDialog(group)"
                 >mdi-plus</v-icon
@@ -20,6 +21,7 @@
               >
                 <v-list-item-action>
                   <v-icon
+                    color="red"
                     @click="
                       deleteAssignment({
                         eventId,
@@ -30,7 +32,13 @@
                     >mdi-minus</v-icon
                   >
                 </v-list-item-action>
-                <v-list-item-title v-text="assignment.user.name" />
+                <v-list-item-content>
+                  <v-list-item-title v-text="assignment.user.name" />
+                  <v-list-item-subtitle
+                    v-if="assignment.comment"
+                    v-text="assignment.comment"
+                  />
+                </v-list-item-content>
               </v-list-item>
             </v-list>
           </v-expansion-panel-content>

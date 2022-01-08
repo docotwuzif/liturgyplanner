@@ -16,6 +16,9 @@
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
+    <v-list-item v-if="assignments.length === 0">
+      <v-list-item-title>Keine Termine vorhanden.</v-list-item-title>
+    </v-list-item>
   </v-list>
 </template>
 

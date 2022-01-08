@@ -46,6 +46,7 @@ export async function getById(id: any) {
       assignments: {
         select: {
           service: true,
+          comment: true,
           user: {
             select: {
               name: true,
