@@ -15,7 +15,7 @@ export async function create(data: any) {
     typeof userId !== 'number' ||
     typeof eventId !== 'number' ||
     typeof serviceId !== 'number' ||
-    typeof serviceId !== 'string'
+    typeof comment !== 'string'
   ) {
     throw new TypeError('Wrong input format.')
   }

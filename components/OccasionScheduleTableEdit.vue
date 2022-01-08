@@ -121,7 +121,7 @@ export default {
   methods: {
     addEmpty() {
       this.scheduleItems.push({
-        id: -this.scheduleItems.length,
+        id: -this.scheduleItems.length - 1,
         source: '',
         sourceRef: '',
         title: '',
