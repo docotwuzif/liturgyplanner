@@ -53,12 +53,56 @@ export async function getAllUsers(authToken: MSAuthToken) {
   return res1.data.value
 }
 
-export async function getUserById(authToken: MSAuthToken, uid: string) {
+export type getUserOptions = {
+  include: {
+    pfp?:
+      | '48x48'
+      | '64x64'
+      | '96x96'
+      | '120x120'
+      | '240x240'
+      | '360x360'
+      | '432x432'
+      | '504x504'
+      | '648x648'
+  }
+}
+
+export async function getUserById(
+  authToken: MSAuthToken,
+  uid: string,
+  options: getUserOptions = { include: { pfp: '120x120' } }
+) {
   const res1 = await axios.get(`/users/${uid}`, {
     headers: {
       Host: 'graph.microsoft.com',
       Authorization: `${authToken.token_type} ${authToken.access_token}`,
     },
   })
-  return res1.data
+
+  const pfp: { picture?: { meta: any; data: any } } = {}
+  if (options.include.pfp) {
+    const resPfpData = await axios({
+      method: 'get',
+      url: `/users/${uid}/photos/${options.include.pfp}/$value`,
+      responseType: 'stream',
+
+      headers: {
+        Host: 'graph.microsoft.com',
+        Authorization: `${authToken.token_type} ${authToken.access_token}`,
+      },
+    })
+    const resPfpMetaData = await axios.get(
+      `/users/${uid}/photos/${options.include.pfp}`,
+      {
+        headers: {
+          Host: 'graph.microsoft.com',
+          Authorization: `${authToken.token_type} ${authToken.access_token}`,
+        },
+      }
+    )
+    pfp.picture = { meta: resPfpMetaData.data, data: resPfpData.data }
+  }
+
+  return { ...res1.data, ...pfp }
 }

@@ -4,6 +4,7 @@ import authMiddleware from './authMiddleware';
 
 import prisma from './db/prisma';
 
+
 const express = require('express');
 
 const expressSession = require('express-session')
@@ -65,6 +66,29 @@ app.use(authMiddleware)
 
 app.get('/users', async(_, res) => {
     res.status(200).json(await db.User.getAll());
+})
+
+app.get('/users/:id', async(req, res, next) => {
+    if (req.params.id !== Number.parseInt(req.params.id).toString()) { next(); return; }
+    try {
+        res.status(200).json(await db.User.getUserData(req.params.id, false));
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+})
+
+
+
+app.get('/users/:id/picture', async(req, res) => {
+    try {
+        const userData = await db.User.getUserData(req.params.id, true);
+        if (userData._aad) {
+            res.type(userData._aad.picture.meta["@odata.mediaContentType"])
+            userData._aad.picture.data.pipe(res)
+        } else res.sendStatus(500);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 })
 
 app.get('/users/:id/assignments/future', async(req, res) => {
@@ -167,6 +191,15 @@ app.post('/users', async(req, res) => {
         res.status(200).json(user)
     } catch {
         res.sendStatus(500)
+    }
+})
+
+
+app.put('/users/:id', async(req, res) => {
+    try {
+        res.status(200).json(await db.User.update(req.params.id, req.body));
+    } catch (err) {
+        res.status(500).send(err.message);
     }
 })
 
