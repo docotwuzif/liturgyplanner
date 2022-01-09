@@ -16,10 +16,13 @@ export default function(req, res, _next) {
 
     const baseUrl = (process.env.NODE_ENV === 'production' ? "https://" : "http://") + req.headers.host;
     const url = new URL(req.url, baseUrl);
-    if (req.url === '/login/aad') {
+    if (req.url.match(/^\/login\/aad\?/i)) {
+        const params = new URLSearchParams(req._parsedUrl.search);
         const authCodeUrlParameters = {
             scopes: ["user.read"],
             redirectUri: `${baseUrl}/auth/login/aad/callback`,
+            domainHint: 'namenjesu.com',
+            state: params.get('ref')
         };
 
 
@@ -29,15 +32,17 @@ export default function(req, res, _next) {
             res.end();
         });
     } else if (req.url.match(/^\/login\/aad\/callback/i)) {
+        const params = new URLSearchParams(req._parsedUrl.search);
         const tokenRequest = {
             code: url.searchParams.get('code'),
             scopes: ["user.read"],
             redirectUri: `${baseUrl}/auth/login/aad/callback`,
+            state: params.get('state')
         };
 
 
         cca.acquireTokenByCode(tokenRequest).then((response) => {
-            res.writeHead(303, { Location: `${baseUrl}/login/aad/${response.accessToken}` });
+            res.writeHead(303, { Location: `${baseUrl}/login/aad/${response.accessToken}?ref=${params.get('state')}` });
             res.end();
 
             _next()

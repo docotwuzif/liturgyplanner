@@ -9,8 +9,8 @@
 <script>
 export default {
   name: 'LoginPage',
-  middleware({ redirect }) {
-    return redirect('/auth/login/aad')
+  middleware({ redirect, route }) {
+    return redirect('/auth/login/aad?ref=' + (route.query.ref || '/'))
   },
 }
 </script>

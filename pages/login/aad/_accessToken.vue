@@ -14,7 +14,8 @@ export default {
         'auth/setUserSignedIn',
         (await this.$axios.$get('/api/auth/status')).auth.user
       )
-      this.$router.push('/')
+      if (this.$route.query.ref) this.$router.push(this.$route.query.ref)
+      else this.$router.push('/')
     } catch {
       this.$router.push('/login')
     }
