@@ -1,6 +1,6 @@
 <template>
   <v-row justify="center" align="center">
-    <v-col cols="12" md="9">
+    <v-col cols="11">
       <OccasionScheduleTableEdit :occasion-id="id" />
     </v-col>
   </v-row>

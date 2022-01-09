@@ -5,6 +5,8 @@
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
       <v-toolbar-title>Terminansicht</v-toolbar-title>
+
+      <v-icon @click="downloadPdf">mdi-file</v-icon>
     </v-toolbar>
     <v-row align="center" justify="center">
       <v-col cols="12" md="6">
@@ -78,6 +80,9 @@ export default {
   methods: {
     async updateAssignments() {
       await this.$nuxt.refresh()
+    },
+    downloadPdf() {
+      window.location.href = `/api/events/${this.event.id}/pdf`
     },
   },
 }

@@ -58,3 +58,43 @@ export async function getById(id: any) {
     },
   })
 }
+
+export async function getForPdf(id: any) {
+  const event = await prisma.event.findUnique({
+    where: {
+      id: Number.parseInt(id),
+    },
+    select: {
+      id: true,
+      name: true,
+      date: true,
+      occasion: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      schedule: {
+        select: {
+          position: true,
+          title: true,
+          source: true,
+          sourceRef: true,
+          remarks: true,
+          events: true,
+        },
+        orderBy: {
+          order: 'asc',
+        },
+      },
+      assignments: {
+        select: {
+          service: true,
+          user: true,
+          comment: true,
+        },
+      },
+    },
+  })
+  return event
+}

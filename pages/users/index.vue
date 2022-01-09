@@ -24,8 +24,8 @@
                       ><v-list-item
                         v-for="role in roles"
                         :key="role"
-                        @click="setRole(role)"
                         dense
+                        @click="setRole(role)"
                         >{{ role }}
                       </v-list-item></v-list
                     ></v-card

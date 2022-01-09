@@ -54,3 +54,11 @@ export async function getEvents(id: any) {
     },
   })
 }
+
+export async function getById(id: any) {
+  return await prisma.occasion.findUnique({
+    where: {
+      id: Number.parseInt(id),
+    },
+  })
+}

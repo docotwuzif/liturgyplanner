@@ -4,6 +4,8 @@
       <v-btn icon @click="$router.back()"
         ><v-icon>mdi-arrow-left</v-icon></v-btn
       >
+      <v-toolbar-title v-if="occasion"> {{ occasion.name }} </v-toolbar-title
+      ><v-spacer />
       <v-menu offset-x
         ><template #activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on"
@@ -36,6 +38,7 @@
               v-for="field in headers"
               :key="field.value"
               class="d-block d-sm-table-cell"
+              :width="field.width || 'auto'"
             >
               <v-text-field
                 v-if="field.value !== 'actions'"
@@ -145,13 +148,14 @@ export default {
   data: () => ({
     scheduleItems: [],
     loading: true,
+    occasion: null,
     headers: [
-      { text: 'Stelle', value: 'position' },
-      { text: 'Quelle', value: 'source' },
-      { text: 'Referenz', value: 'sourceRef' },
+      { text: 'Stelle', value: 'position', width: 170 },
+      { text: 'Quelle', value: 'source', width: 110 },
+      { text: 'Referenz', value: 'sourceRef', width: 70 },
       { text: 'Title', value: 'title' },
       { text: 'Anmerkungen', value: 'remarks' },
-      { text: 'Aktionen', value: 'actions' },
+      { text: 'Aktionen', value: 'actions', width: 150 },
     ],
     openChanges: false,
     toDelete: [],
@@ -166,6 +170,7 @@ export default {
     this.events = await this.$axios.$get(
       `/api/occasions/${this.occasionId}/events`
     )
+    this.occasion = await this.$axios.$get(`/api/occasions/${this.occasionId}`)
     this.scheduleItems = this.scheduleItems.map((x) => ({
       ...x,
       events: x.events.map((y) => y.id),

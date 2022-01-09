@@ -11,7 +11,8 @@ const expressSession = require('express-session')
 
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store')
 
-
+const htmlPdf = require('html-pdf-node')
+const pdfTemplates = require('./pdf/templates')
 
 const userMetaData = (req) => ({
     createdBy: req.session.auth.user.name,
@@ -59,6 +60,7 @@ app.post('/auth/register', async(req, res) => {
     }
     res.sendStatus(200)
 })
+
 
 // RESTRICTED - user need to be authorized
 
@@ -110,6 +112,27 @@ app.get('/events/past', async(_, res) => {
 
 app.get('/events/:id', async(req, res) => {
     res.status(200).json(await db.Event.getById(req.params.id))
+})
+
+
+app.get('/events/:id/pdf', async(req, res) => {
+    const template = await pdfTemplates.event(req.params.id);
+
+    const options = { format: 'A5' };
+    // Example of options with args //
+    // let options = { format: 'A4', args: ['--no-sandbox', '--disable-setuid-sandbox'] };
+
+    const file = { content: template.content };
+
+    htmlPdf.generatePdf(file, options).then(pdfBuffer => {
+        res.type('pdf');
+        res.setHeader('Content-disposition', `attachment; filename=${template.event.occasion.name}_${template.event.name}.pdf`);
+        res.status(200).send(pdfBuffer);
+    });
+})
+
+app.get('/occasions/:id', async(req, res) => {
+    res.status(200).json(await db.Occasion.getById(req.params.id))
 })
 app.get('/occasions/:id/schedule', async(req, res) => {
     res.status(200).json(await db.Schedule.getForOccasion(req.params.id))
