@@ -1,17 +1,21 @@
 <template>
   <v-dialog v-model="addingDialog" max-width="400">
-    <template #activator="{ attrs, on }">
-      <v-expansion-panels multiple v-bind="attrs" v-on="on">
+    <template #activator="{ attrs }">
+      <v-expansion-panels multiple v-bind="attrs">
         <v-expansion-panel v-for="group in serviceGroups" :key="group.id">
           <v-expansion-panel-header
             :style="`color: rgb(0,0,0,${group.count === 0 ? '.38' : '.87'})`"
-            >{{ group.name }} ({{ group.count }})<template #actions
-              ><v-icon color="green" @click="showAddingDialog(group)"
+          >
+            {{ group.name }} ({{ group.count }})
+            <template #actions
+              ><v-icon
+                color="green"
+                @click.native.stop="showAddingDialog(group)"
                 >mdi-plus</v-icon
               >
               <v-icon color="primary"> $expand </v-icon>
-            </template></v-expansion-panel-header
-          >
+            </template>
+          </v-expansion-panel-header>
           <v-expansion-panel-content>
             <p v-if="group.assignments.length === 0">Keine Einteilung.</p>
             <v-list v-if="group.assignments.length > 0" dense>
